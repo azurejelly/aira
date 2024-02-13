@@ -20,7 +20,7 @@ impl EventHandler for Handler {}
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
+    dotenv().expect("Could not load .env file");
     
     let framework = StandardFramework::new().group(&GENERAL_GROUP);
     framework.configure(Configuration::new().prefix("~"));
