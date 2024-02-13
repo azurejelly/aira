@@ -3,43 +3,24 @@ extern crate dotenv;
 use std::env;
 
 use dotenv::dotenv;
-use serenity::async_trait;
+use log::error;
 use serenity::prelude::*;
-use serenity::model::channel::Message;
-use serenity::framework::standard::macros::{command, group};
-use serenity::framework::standard::{StandardFramework, Configuration, CommandResult};
 
-#[group]
-#[commands(ping)]
-struct General;
-
-struct Handler;
-
-#[async_trait]
-impl EventHandler for Handler {}
+mod events;
 
 #[tokio::main]
 async fn main() {
     dotenv().expect("Could not load .env file");
-    
-    let framework = StandardFramework::new().group(&GENERAL_GROUP);
-    framework.configure(Configuration::new().prefix("~"));
+    env_logger::init();
 
     let token = env::var("DISCORD_TOKEN").expect("token");
-    let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
+    let intents = GatewayIntents::empty();
     let mut client = Client::builder(token, intents)
-        .event_handler(Handler)
-        .framework(framework)
+        .event_handler(events::Handler)
         .await
         .expect("Error creating client");
 
     if let Err(why) = client.start().await {
-        println!("An error occurred while running the client: {:?}", why);
+        error!("Failed to start client: {:?}", why);
     }
-}
-
-#[command]
-async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    msg.reply(ctx, "Pong!").await?;
-    Ok(())
 }
