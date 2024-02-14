@@ -6,7 +6,8 @@ use dotenv::dotenv;
 use log::error;
 use serenity::prelude::*;
 
-mod events;
+mod commands;
+mod handlers;
 
 #[tokio::main]
 async fn main() {
@@ -16,7 +17,7 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("token");
     let intents = GatewayIntents::empty();
     let mut client = Client::builder(token, intents)
-        .event_handler(events::Handler)
+        .event_handler(handlers::SerenityHandler)
         .await
         .expect("Error creating client");
 
